@@ -6,19 +6,6 @@ import { ItemService } from './item.service';
 import { ResourceService } from './resource.service';
 import { AddItemToIventory, CustomError } from '../../domain';
 
-// export const AppDataSource = new DataSource({
-//   type: 'postgres', 
-//   host: 'localhost',
-//   port: 5432,
-//   username: 'postgres',
-//   password: '38608820',
-//   database: 'clanvideogame',
-//   synchronize: true,
-//   logging: false,
-//   entities: [Inventory_item, Inventory_resourceaa],
-//   migrations: [],
-//   subscribers: [],
-// });
 
 export class InventoryService {
 

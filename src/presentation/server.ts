@@ -1,5 +1,4 @@
 import express, { Router } from 'express';
-// import { AppDataSource } from './services/inventory.service';
 
 interface Options {
   port: number;
