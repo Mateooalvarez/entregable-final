@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { AppDataSource } from './services/inventory.service';
+// import { AppDataSource } from './services/inventory.service';
 
 interface Options {
   port: number;
@@ -23,15 +23,20 @@ export class Server {
 
     this.app.use(this.routes)
 
-    AppDataSource.initialize()
-      .then(() => {
-        console.log('Data Source has been initialized!');
+    this.app.listen(this.port, () => {
+            console.log(`Server started on port ${this.port}`);
+          })
+  
 
-        this.app.listen(this.port, () => {
-          console.log(`Server started on port ${this.port}`);
-        })
+    // AppDataSource.initialize()
+    //   .then(() => {
+    //     console.log('Data Source has been initialized!');
 
-      })
-      .catch((error) => console.error('Error during Data Source initialization', error));
+    //     this.app.listen(this.port, () => {
+    //       console.log(`Server started on port ${this.port}`);
+    //     })
+
+    //   })
+    //   .catch((error: any) => console.error('Error during Data Source initialization', error));
   }
 }

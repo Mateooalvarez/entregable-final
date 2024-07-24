@@ -6,19 +6,19 @@ import { ItemService } from './item.service';
 import { ResourceService } from './resource.service';
 import { AddItemToIventory, CustomError } from '../../domain';
 
-export const AppDataSource = new DataSource({
-  type: 'postgres', 
-  host: 'localhost',
-  port: 5432,
-  username: 'postgres',
-  password: '38608820',
-  database: 'clanvideogame',
-  synchronize: true,
-  logging: false,
-  entities: [Inventory_item, Inventory_resource],
-  migrations: [],
-  subscribers: [],
-});
+// export const AppDataSource = new DataSource({
+//   type: 'postgres', 
+//   host: 'localhost',
+//   port: 5432,
+//   username: 'postgres',
+//   password: '38608820',
+//   database: 'clanvideogame',
+//   synchronize: true,
+//   logging: false,
+//   entities: [Inventory_item, Inventory_resourceaa],
+//   migrations: [],
+//   subscribers: [],
+// });
 
 export class InventoryService {
 
@@ -127,24 +127,27 @@ export class InventoryService {
   }
 
   async getPlayerInventory(playerId: number) {
-    try {
-      const inventoryItemRepository = AppDataSource.getRepository(Inventory_item);
-      const inventoryResourceRepository = AppDataSource.getRepository(Inventory_resource);
+    
+    const inventoryId = await this.findOneInventoryByPlayerId(playerId)
 
-      const inventoryItems = await inventoryItemRepository.find({
-        where: { inventory: { player: playerId } },
-        relations: ['item'],
-      });
+    if (!inventoryId) return CustomError.notFound("player not existing")
 
-      const inventoryResources = await inventoryResourceRepository.find({
-        where: { inventory: { player: playerId } },
-        relations: ['resource'],
-      });
+      const inventoryOffPlayer = await Inventory.findOne({
+        where: {
+          id: inventoryId,
+        },
+        relations: ["inventory_item", "inventory_resource"],
+        select: {
+          inventory_item: {
+            id: true,
+            quantity: true,
+          }
+        }
+      })
 
-      return { items: inventoryItems, resources: inventoryResources };
-    } catch (error) {
-      throw new Error('Failed to get player inventory');
+      if (!inventoryOffPlayer) {
+        throw CustomError.notFound("player not inventories")
+      }
+      return inventoryOffPlayer
     }
-  }
-
 }

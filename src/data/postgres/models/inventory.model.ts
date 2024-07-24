@@ -27,3 +27,4 @@ export class Inventory extends BaseEntity {
   @UpdateDateColumn()
   updated_at: Date;
 }
+
