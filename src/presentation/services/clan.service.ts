@@ -1,70 +1,90 @@
-import { Clan, ClanMember, ClanMemberRole, PostgresDatabase } from '../../data';
-import { CustomError, JoinMember } from '../../domain';
-import { AppDataSource } from './inventory.service';
-import { PlayerService } from './player.service';
+import { ClanMember, ClanMemberRole, Clan } from "../../data";
+import { CustomError, JoinMember } from "../../domain";
+import { AddClansDto } from "../../domain/dtos/clan/add-clans.dto";
+import { PlayerService } from "./player.service";
 
 export class ClanService {
   constructor(private readonly playerService: PlayerService) {}
 
   async addMemberToClan(playerReceiverId: number, joinMemberDTO: JoinMember) {
-    // Buscar jugador receptor
-    const playerReceiverPromise = this.playerService.findOnePlayer(playerReceiverId);
-    // Buscar jugador remitente
-    const playerSenderPromise = this.playerService.findOnePlayer(joinMemberDTO.senderMemberId);
+    const playerReceiverPromise =
+      this.playerService.findOnePlayer(playerReceiverId);
 
-    const [playerReceiver, playerSender] = await Promise.all([playerReceiverPromise, playerSenderPromise]);
+    const playerSenderPromise = this.playerService.findOnePlayer(
+      joinMemberDTO.senderMemberId
+    );
 
-    // Validar existencia de jugadores
-    if (!playerReceiver) throw CustomError.notFound('Player Receiver not found');
-    if (!playerSender) throw CustomError.notFound('Player Sender not found');
+    const [playerReceiver, playerSender] = await Promise.all([
+      playerReceiverPromise,
+      playerSenderPromise,
+    ]);
 
-    // Validar rol del remitente
-    const allowedRoles = [ClanMemberRole.MASTER, ClanMemberRole.OFFICER, ClanMemberRole.SUBOFFICER];
-    const senderClanMember = playerSender.clanMembers?.[0];
+    if (!playerReceiver)
+      throw CustomError.notFound("Player Receiver not found");
+    if (!playerSender) throw CustomError.notFound("Player Sender not found");
 
-    if (!senderClanMember || !allowedRoles.includes(senderClanMember.role)) {
-      throw CustomError.badRequest("You don't have permission to join this clan");
+    const allowedRoles = [
+      ClanMemberRole.MASTER,
+      ClanMemberRole.OFFICER,
+      ClanMemberRole.SUBOFFICER,
+    ];
+
+    if (!allowedRoles.includes(playerSender.clanMembers[0].role)) {
+      throw CustomError.badRequest(
+        "You don't have permission to join this clan"
+      );
     }
 
-    // Crear nueva instancia de ClanMember y asignar jugador y clan
     const clanMember = new ClanMember();
     clanMember.player = playerReceiver;
-    clanMember.clan = senderClanMember.clan;
+    clanMember.clan = playerSender.clanMembers[0].clan;
 
-    // Guardar ClanMember en la base de datos
     try {
       return await clanMember.save();
     } catch (error) {
-      throw CustomError.internalServer('Something went wrong while adding member to clan');
+      throw CustomError.internalServer("Something went wrong");
     }
   }
 
-  async createClan(name: string): Promise<Clan> {
+  async createClan(addClanDto: AddClansDto) {
+    const clanExisting = await this.finClanByname(addClanDto.name);
+    if (clanExisting)
+      throw CustomError.badRequest("name of clan existing...✕✕✕");
+
+    const clan = new Clan();
+    clan.name = addClanDto.name.toLocaleLowerCase().trim();
+    clan.description = addClanDto.description.toLocaleLowerCase().trim();
+
     try {
-      // Crear nueva instancia de Clan y asignar nombre
-      const clan = new Clan();
-      clan.name = name;
-      // Guardar clan en la base de datos
-      await clan.save();
-      return clan;
+      return await clan.save();
     } catch (error) {
-      throw CustomError.internalServer('Error creating clan');
+      throw CustomError.internalServer("Something went wrong...");
     }
+  }
+
+  async finClanByname(name: string) {
+    const clan = await Clan.findOne({
+      where: {
+        name,
+      },
+    });
+    if (clan) throw CustomError.badRequest("This name is already existing");
+    return clan;
+  }
+  async findClanMembersById(id: number) {
+    const clan = await Clan.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        clanMembers: {
+          player: true,
+        },
+      },
+    });
+
+    console.log(clan);
+    if (!clan) throw CustomError.badRequest("This clan not existing");
+    return clan;
   }
 }
-  export const getMembersByClanId = async (clanId: number): Promise<ClanMember[] | null> => {
-    try {
-      const repository = AppDataSource.getRepository(ClanMember);
-      const members = await repository.find({
-        where: { clan: { id: clanId } },
-        relations: ['clan'],
-      });
-  
-      return members.length ? members : null;
-    } catch (error) {
-      console.error('Database query error:', error);
-      throw new Error('Failed to retrieve clan members');
-    }
-  };
-
-

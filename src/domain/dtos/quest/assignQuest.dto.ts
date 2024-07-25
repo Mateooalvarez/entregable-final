@@ -1,7 +1,7 @@
 
 
-export interface AssignQuestDTO {
-    playerId: number; 
-    completed?: boolean; 
-  }
+// export interface AssignQuestDTO {
+//     playerId: number; 
+//     completed?: boolean; 
+//   }
   

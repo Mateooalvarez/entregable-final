@@ -23,19 +23,7 @@ export class Server {
     this.app.use(this.routes)
 
     this.app.listen(this.port, () => {
-            console.log(`Server started on port ${this.port}`);
-          })
-  
-
-    // AppDataSource.initialize()
-    //   .then(() => {
-    //     console.log('Data Source has been initialized!');
-
-    //     this.app.listen(this.port, () => {
-    //       console.log(`Server started on port ${this.port}`);
-    //     })
-
-    //   })
-    //   .catch((error: any) => console.error('Error during Data Source initialization', error));
+      console.log(`Server started on port ${this.port}`);
+    })
   }
 }

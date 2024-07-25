@@ -5,7 +5,7 @@ import { ClanMember } from './models/clanMember.model';
 import { Clan } from './models/clans.model';
 import { Construction } from './models/constructions.model';
 import { Inventory } from './models/inventory.model';
-import { Item } from './models/item.model';
+import { Items } from './models/item.model';
 import { Quest_player } from './models/questPlayer.model';
 import { Quest } from './models/quest.model';
 import { Resource } from './models/resource.model';
@@ -33,7 +33,7 @@ export class PostgresDatabase {
       username: options.username,
       password: options.password,
       database: options.database,
-      entities: [User, Player, ClanMember, Clan, Construction, Inventory, Item, Quest_player, Quest, Resource, Inventory_item, Inventory_resource],
+      entities: [User, Player, ClanMember, Clan, Construction, Inventory, Items, Quest_player, Quest, Resource, Inventory_item, Inventory_resource],
       synchronize: true,
     })
   }

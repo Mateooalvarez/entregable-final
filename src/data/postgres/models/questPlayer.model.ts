@@ -15,8 +15,8 @@ export class Quest_player extends BaseEntity {
 
   @ManyToOne(() => Quest, (quest) => quest.questsPlayer)
   quest: Quest;
-  
-  @Column('boolean', {
+
+  @Column("boolean", {
     nullable: false,
     default: false,
   })

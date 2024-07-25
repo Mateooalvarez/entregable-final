@@ -9,20 +9,24 @@ export class Resource extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('varchar', {
+  @Column("varchar", {
     length: 100,
     nullable: false,
+    unique: true,
   })
   name: string;
 
-  @Column('text', {
+  @Column("text", {
     nullable: false,
   })
   description: string;
 
-  @OneToMany(() => Inventory_resource, (inventory_resource) => inventory_resource.resource)
+  @OneToMany(
+    () => Inventory_resource,
+    (inventory_resource) => inventory_resource.resource
+  )
   inventory_resource: Inventory_resource[];
-  
+
   @CreateDateColumn()
   created_at: Date;
 

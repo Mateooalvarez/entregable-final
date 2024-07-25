@@ -1,7 +1,7 @@
 
 
 import { Router } from 'express';
-import { ClanController, createClanHandler, getClanMembers } from './controller';
+import { ClanController } from './controller';
 import { PlayerService } from '../services/player.service';
 import { UserService } from '../services/user.service';
 import { ClanService } from '../services/clan.service';
@@ -17,9 +17,9 @@ export class ClanRoutes {
     const clanService = new ClanService(playerService);
     const controller = new ClanController(clanService);
 
-    router.post('/',createClanHandler(clanService))
+    router.post('/', controller.addMemberToClan)
     router.post('/:playerReceiverId/join', controller.addMemberToClan)
-    router.get('/api/clans/:id/members', getClanMembers)
+    router.get('/api/clans/:id/members', controller.getClanMembersById)
 
     return router;
   }

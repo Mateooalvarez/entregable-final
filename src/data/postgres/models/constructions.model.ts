@@ -6,35 +6,39 @@ export class Construction extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Player, (player) => player.constructions)
-  player: Player;
-
-  @Column('varchar', {
+  
+  @Column("varchar", {
     length: 255,
     nullable: false,
+    unique: true,
+    
   })
   name: string;
-
-  @Column('varchar', {
+  
+  @Column("varchar", {
     length: 255,
     nullable: false,
   })
   type: string;
-
-  @Column('int', {
+  
+  @Column("int", {
     nullable: false,
+    default: 1,
   })
   level: number;
-
-  @Column('varchar', {
+  
+  @Column("varchar", {
     length: 255,
     nullable: false,
   })
   location: string;
-
+  
+  @ManyToOne(() => Player, (player) => player.constructions)
+  player: Player;
+  
   @CreateDateColumn()
   created_at: Date;
-
+  
   @UpdateDateColumn()
   updated_at: Date;
 }

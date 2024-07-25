@@ -3,7 +3,7 @@
 
 import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Inventory } from './inventory.model';
-import { Item } from './item.model';
+import { Items } from './item.model';
 
 @Entity()
 export class Inventory_item extends BaseEntity {
@@ -13,8 +13,8 @@ export class Inventory_item extends BaseEntity {
   @ManyToOne(() => Inventory, (inventory) => inventory.inventory_item)
   inventory: Inventory;
 
-  @ManyToOne(() => Item, (item) => item.inventory_item)
-  item: Item
+  @ManyToOne(() => Items, (item) => item.inventory_item)
+  item: Items
 
   @Column('int', {
     nullable: false,

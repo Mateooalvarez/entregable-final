@@ -1,31 +1,52 @@
-import { Resource } from '../../data';
-import { CustomError } from '../../domain';
-import { AppDataSource } from './inventory.service';
-
+import { create } from "domain";
+import { Resource } from "../../data";
+import { CustomError } from "../../domain";
+import { CreateResoucesDTO } from "../../domain/dtos/resources/create-resources.dto";
 
 export class ResourceService {
-
-  async createResource(data: Partial<Resource>) {
-    const resourceRepository = AppDataSource.getRepository(Resource);
-    const newResource = resourceRepository.create(data);
-    await resourceRepository.save(newResource)
-    return newResource
-  }
-
-  async getAllResources(){
-    const resourceRepository = AppDataSource.getRepository(Resource)
-    return await resourceRepository.find()
-  }
-
-  async findOneResourceById(id: number){
+  async findOneResourceById(id: number) {
     const resource = await Resource.findOne({
       where: {
-        id: id
-      }
-    })
+        id,
+      },
+    });
 
-    if (!resource) throw CustomError.notFound("Resource not found")
+    if (!resource) throw CustomError.notFound("Resource not found");
 
+    return resource;
+  }
+  async findOneResourceByname(name: string) {
+    const resources = await Resource.findOne({
+      where: {
+        name,
+      },
+    });
+    if (resources)
+      throw CustomError.badRequest("This name is already existing");
+    return resources;
+  }
+  async createResources(createResoucesDTO: CreateResoucesDTO) {
+    const resourceExisting = await this.findOneResourceByname(
+      CreateResoucesDTO.name
+    );
+
+    if (resourceExisting)
+      throw CustomError.badRequest("Nombre de recurso ya existe");
+
+    const resource = new Resource();
+    resource.name = createResoucesDTO.name.toLocaleLowerCase().trim();
+    resource.description = createResoucesDTO.description
+      .toLocaleLowerCase()
+      .trim();
+
+    try {
+      return await resource.save();
+    } catch (error) {
+      throw CustomError.internalServer("Something went wrong...");
+    }
+  }
+  async findAllResources() {
+    const resource = await Resource.find();
     return resource;
   }
 

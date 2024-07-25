@@ -1,16 +1,20 @@
 import { Router } from 'express';
 import { ConstructionController } from './controller';
-import { ConstructionService } from '../services/construction.service';
+import { ConstructionsService } from '../services/construction.service';
+import { UserService } from '../services/user.service';
+import { PlayerService } from '../services/player.service';
 
 export class ConstructionRoutes {
   static get routes(): Router {
     const router = Router();
 
-    const constructionService = new ConstructionService();
-    const constructionController = new ConstructionController(constructionService);
+    const userService = new UserService()
+    const playerService = new PlayerService(userService)
+    const constructionsService = new ConstructionsService(playerService);
+    const constructionController = new ConstructionController(constructionsService);
 
     router.post('/', constructionController.createConstruction);
-    router.post('/players/:id/constructions', constructionController.getconstructionsbyPlayer);
+    router.post('/players/:id/constructions', constructionController.createConstruction);
 
     return router;
   }

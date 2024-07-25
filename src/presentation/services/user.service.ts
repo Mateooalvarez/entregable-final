@@ -1,83 +1,70 @@
-import { bcryptAdapter } from '../../config/bcrypt.adapter';
-import { JwtAdapter } from '../../config/jwt.adapter';
-import { User } from '../../data';
-import { CreateUserDTO, CustomError, LoginUserDTO } from '../../domain';
+import { bcryptAdapter } from "../../config/bcrypt.adapter";
+import { JwtAdapter } from "../../config/jwt.adapter";
+import { User } from "../../data/postgres/models/user.model";
+import { CreateUserDto, CustomError, LoginUserDTO } from "../../domain";
 
 export class UserService {
+  constructor() {}
 
-
-  async findeOneUser (id: number) {
-    const user = await User.findOne({
+  async register(createUserDto: CreateUserDto) {
+    const existUser = await User.findOne({
       where: {
-        id
+        email: createUserDto.email,
       },
-      relations: ['players'],
-    })
+    });
 
-    if (!user) throw CustomError.notFound("User not found")
+    if (existUser) throw CustomError.badRequest("Email already exist");
+    const user = new User();
 
-    return user;
+    user.username = createUserDto.username.toLocaleLowerCase().trim();
+    user.email = createUserDto.email.toLocaleLowerCase().trim();
+    user.password = bcryptAdapter.hash(createUserDto.password);
+
+    try {
+      return await user.save();
+    } catch (error: any) {
+      throw CustomError.internalServer("Something went very wrong! 😵‍💫");
+    }
   }
 
-  async login (loginUserDTO: LoginUserDTO) {
-
-    const { email, password, username } = loginUserDTO;
-    
+  public async login(loginUserDto: LoginUserDTO) {
     const user = await User.findOne({
-      where: [
-        { email },
-        { username }
-      ]
+      where: {
+        email: loginUserDto.email,
+      },
     });
-    if (!user) throw CustomError.unAuthorized("Invalid email or password")
+    if (!user) throw CustomError.unAuthorized("Invalid credentials 11");
 
-    const isMatching = bcryptAdapter.compare(password, user.password)
-    if (!isMatching) throw CustomError.unAuthorized("Invalid email or password")
+    const istMatching = bcryptAdapter.compare(
+      loginUserDto.password,
+      user.password
+    );
+    if (!istMatching) throw CustomError.unAuthorized("Invalid password");
 
-    const token = await JwtAdapter.generateToken({ id: user.id })
-    if (!token) throw CustomError.internalServer("Error while creating JWT");
+    const token = await JwtAdapter.generateToken({ id: user.id });
+    if (!token)
+      throw CustomError.internalServer("Error while creating JWT -- 😵‍💫");
 
     return {
-      token,
+      token: token,
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
-      }
-    }
+      },
+    };
   }
 
-  async register (createUserDTO: CreateUserDTO) {
-    const { email, username } = createUserDTO;
-
-    const existUser = await User.findOne({
-      where: [
-        { email },
-        { username }
-      ]
+  async findeOneUser(id: number) {
+    const user = await User.findOne({
+      where: {
+        id,
+      },
+      relations: ["players"],
     });
+    if (!user) throw CustomError.notFound("User not found");
 
-    if (existUser) {
-      if (existUser.email === email) {
-        throw CustomError.badRequest("This email is already taken");
-      }
-      if (existUser.username === username) {
-        throw CustomError.badRequest("This username is already taken");
-      }
-    }
-
-    const user = new User();
-    user.email = email;
-    user.username = username;
-    user.password = bcryptAdapter.hash(createUserDTO.password);
-
-    try {
-      return await user.save()
-    } catch (error){
-      throw CustomError.internalServer("Something went wrong")
-    }
+    return user;
   }
-
-  
-
 }
+ 

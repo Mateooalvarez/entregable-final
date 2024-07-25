@@ -5,7 +5,7 @@ import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGenerat
 import { Inventory_item } from './inventoryItem.model';
 
 @Entity()
-export class Item extends BaseEntity {
+export class Items extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

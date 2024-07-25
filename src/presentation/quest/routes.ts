@@ -2,11 +2,10 @@
 
 
 import { Router } from 'express';
-import { createQuestController, QuestController } from './controller';
+import { QuestController } from './controller';
 import { QuestService } from '../services/quest.service';
 import { PlayerService } from '../services/player.service';
 import { UserService } from '../services/user.service';
-import { assignQuestToPlayerController } from '../questPlayer/controller';
 
 
 export class QuestRoutes {
@@ -20,8 +19,7 @@ export class QuestRoutes {
     const controller = new QuestController(questService);
 
     router.post('/:playerId/assign', controller.addQuestToPlayer)
-    router.post('/api/quests', createQuestController)
-    router.post('/quests/:id/assign', assignQuestToPlayerController)
+    router.post('/api/quests', controller.createQuest)
 
     return router;
   }

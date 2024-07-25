@@ -1,16 +1,16 @@
-import { Router } from 'express';
-import { ResourceController } from './controller';
-import { ResourceService } from '../services/resource.service';
+import { Router } from "express";
+import { ResourceService } from "../services/resource.service";
+import { ResoucesController } from "./controller";
 
-export class ResourceRoutes {
+export class ResourcesRouter {
   static get routes(): Router {
     const router = Router();
 
-    const resourceService = new ResourceService();
-    const resourceController = new ResourceController(resourceService);
+    const resourcesService = new ResourceService();
+    const resourcesController = new ResoucesController(resourcesService);
 
-    router.post('/', resourceController.createResource);
-    router.post('/', resourceController.getAllResources);
+    router.post("/", resourcesController.createResources);
+    router.get("/", resourcesController.getAllResouces);
 
     return router;
   }

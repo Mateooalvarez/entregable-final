@@ -7,7 +7,6 @@ import { PlayerService } from '../services/player.service';
 import { InventoryService } from '../services/inventory.service';
 import { ItemService } from '../services/item.service';
 import { ResourceService } from '../services/resource.service';
-import { getPlayerQuestsController } from '../questPlayer/controller';
 
 
 export class PlayerRoutes {
@@ -25,8 +24,8 @@ export class PlayerRoutes {
     router.post('/', playerController.createPlayer)
     router.get('/:id', playerController.findOnePlayer)
     router.post('/:id/inventory', playerController.addItemToInventory)
-    router.get('/:id', playerController.getPlayerInventory)
-    router.get('/players/:id/quests', getPlayerQuestsController)
+    router.get('/:id/inventory', playerController.getPlayerInventoryById)
+    router.get('/players/:id/quests', playerController.getPlayerConstructionsById)
 
     router.post('/:id/invetory/items', playerController.addItemToInventory)
 

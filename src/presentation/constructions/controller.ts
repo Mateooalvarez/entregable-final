@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import { ConstructionService } from '../services/construction.service';
 import { CustomError } from '../../domain';
+import { AddConstructionsDto } from '../../domain/dtos/constructions/add-constructions.dto';
+import { ConstructionsService } from '../services/construction.service';
 
 export class ConstructionController {
-  constructor(private readonly constructionService: ConstructionService) {}
+  constructor(private readonly constructionService: ConstructionsService) {}
 
   private handleError = (error: unknown, res: Response) => {
     if (error instanceof CustomError) {
@@ -15,21 +16,14 @@ export class ConstructionController {
   }
 
   createConstruction = async (req: Request, res: Response) => {
-    try {
-      const newConstruction = await this.constructionService.createConstruction(req.body);
-      return res.status(201).json(newConstruction);
-    } catch (error) {
-      this.handleError(error, res);
-    }
-  }
+    const [error, createConstructionsDto] =
+    AddConstructionsDto.createConstructions(req.body);
+  if (error) throw res.status(422).json({ message: error });
 
-  getconstructionsbyPlayer = async ( req: Request, res: Response) => {
-    const {id} = req.params
-    try{
-        const constructions = await this.constructionService.getconstructionsbyPlayer(+id)
-        return res.status(200).json(constructions)
-    }catch (error){
-        this.handleError(error, res)
-    }
-  }
+  this.constructionService
+    .createConstructions(createConstructionsDto!)
+    .then((construc) => res.status(201).json(construc))
+    .catch((error) => this.handleError(error, res));
+};
 }
+

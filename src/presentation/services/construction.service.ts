@@ -1,22 +1,44 @@
-import { Construction } from "../../data";
-import { AppDataSource } from "./inventory.service";
+import { Construction, Player } from "../../data";
+import { CustomError } from "../../domain";
+import { AddConstructionsDto } from "../../domain/dtos/constructions/add-constructions.dto";
+import { PlayerService } from "./player.service";
 
-export class ConstructionService {
-  async createConstruction(data: Partial<Construction>) {
-    const constructionRepository = AppDataSource.getRepository(Construction);
-    const newConstruction = constructionRepository.create(data);
-    await constructionRepository.save(newConstruction);
-    return newConstruction;
+export class ConstructionsService {
+  constructor(private readonly playerService: PlayerService) {}
+
+  async createConstructions(createConstructionsDto: AddConstructionsDto) {
+    const constructions = new Construction();
+    const player = await this.playerService.findOnePlayer(
+      createConstructionsDto.playerId
+    );
+
+    if (!player) throw CustomError.internalServer("Player not existing");
+
+    constructions.name = createConstructionsDto.name.toLocaleLowerCase().trim();
+    constructions.type = createConstructionsDto.type.toLocaleLowerCase().trim();
+    constructions.location = createConstructionsDto.location
+      .toLocaleLowerCase()
+      .trim();
+    constructions.player = player;
+
+    try {
+      return await constructions.save();
+    } catch (error) {
+      throw CustomError.internalServer("Something went wrong...");
+    }
   }
 
-  async getconstructionsbyPlayer(playerId: number){
-    const constructionRepository = AppDataSource.getMongoRepository(Construction)
-    return await constructionRepository.find({
-        where: {
-            player: {
-                id: playerId
-            }
-        }
-    })
+
+  async findConstructionsPlayerById(playerId: number) {
+
+    const existing = await Construction.findOne({
+      where: {
+        id: playerId,
+      },
+    });
+
+    if (!existing) {
+      throw CustomError.notFound("player not constructions");
+    }
   }
 }

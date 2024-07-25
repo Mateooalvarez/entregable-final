@@ -1,6 +1,7 @@
 
 
 
+
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Player } from './player.model';
 import { Inventory_resource } from './inventoryResource.model';
@@ -16,7 +17,7 @@ export class Inventory extends BaseEntity {
   player: Player;
   
   @OneToMany(() => Inventory_resource, (inventory_resource) => inventory_resource.inventory )
-  inventory: Inventory_resource[];
+  inventory_resource: Inventory_resource[];
 
   @OneToMany(() => Inventory_item, (inventory_item) => inventory_item.inventory)
   inventory_item: Inventory_item[];
@@ -27,4 +28,3 @@ export class Inventory extends BaseEntity {
   @UpdateDateColumn()
   updated_at: Date;
 }
-

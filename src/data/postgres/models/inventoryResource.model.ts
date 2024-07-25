@@ -17,7 +17,7 @@ export class Inventory_resource extends BaseEntity {
   quantity: number;
 
 
-  @ManyToOne(() => Inventory, (inventory) => inventory.inventory)
+  @ManyToOne(() => Inventory, (inventory) => inventory.inventory_resource)
   inventory: Inventory;
 
   @ManyToOne(() => Resource, (resource) => resource.inventory_resource)

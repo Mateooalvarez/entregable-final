@@ -1,33 +1,39 @@
-import { Request, Response } from 'express';
-import { ResourceService } from '../services/resource.service';
-import { CustomError } from '../../domain';
+import { Request, Response } from "express";
+import {  CustomError } from "../../domain";
+import { ResourceService } from "../services/resource.service";
+import { CreateResoucesDTO } from "../../domain/dtos/resources/create-resources.dto";
 
-export class ResourceController {
-  constructor(private readonly resourceService: ResourceService) {}
+export class ResoucesController {
+  constructor(
+   
+    private readonly resourcesService: ResourceService
+  ) {}
 
   private handleError = (error: unknown, res: Response) => {
     if (error instanceof CustomError) {
       return res.status(error.statusCode).json({ message: error.message });
     }
 
-    return res.status(500).json({ message: 'Something went very wrong! 🧨' });
-  }
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "Something went very wrong 🧨🧨🧨" });
+  };
 
-  createResource = async (req: Request, res: Response) => {
-    try {
-      const newResource = await this.resourceService.createResource(req.body);
-      return res.status(201).json(newResource);
-    } catch (error) {
-      this.handleError(error, res);
-    }
-  }
+  createResources = async (req: Request, res: Response) => {
+    const [error, createResourcesDTO] = CreateResoucesDTO.create(req.body);
+    if (error) return res.status(422).json({ message: error });
 
-  getAllResources = async (req: Request, res: Response) => {
-    try{
-        const resources = await this.resourceService.getAllResources()
-        return res.setMaxListeners(200).json(resources)
-    }catch (error){
-        this.handleError(error, res)
-    }
-  }
+    this.resourcesService
+      .createResources(createResourcesDTO!)
+      .then((resource) => res.status(201).json(resource))
+      .catch((error) => this.handleError(error, res));
+  };
+
+  getAllResouces = async (req: Request, res: Response) => {
+    this.resourcesService
+      .findAllResources()
+      .then((resources) => res.status(200).json(resources))
+      .catch((error: unknown) => this.handleError(error, res));
+  };
 }

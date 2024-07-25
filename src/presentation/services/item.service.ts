@@ -1,12 +1,10 @@
-import { Item } from '../../data';
+import { Items } from '../../data';
 import { CustomError } from '../../domain';
-
-
 
 export class ItemService {
 
   async findOneItemById(id: number){
-    const item = await Item.findOne({
+    const item = await Items.findOne({
       where: {
         id,
       }
@@ -16,5 +14,4 @@ export class ItemService {
     
     return item;
   }
-
 }

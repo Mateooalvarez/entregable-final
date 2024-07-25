@@ -1,31 +1,38 @@
-
-import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Quest_player } from './questPlayer.model';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { Quest_player } from "./questPlayer.model";
 
 @Entity()
 export class Quest extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('varchar', {
+  @Column("varchar", {
     length: 255,
     nullable: false,
     unique: true,
   })
   name: string;
 
-  @Column('text', {
+  @Column("text", {
     nullable: false,
   })
   description: string;
 
-  @Column('varchar', {
+  @Column("varchar", {
     length: 255,
     nullable: false,
   })
   reward: string;
 
-  @Column('float', {
+  @Column("float", {
     nullable: false,
   })
   exp: number;
